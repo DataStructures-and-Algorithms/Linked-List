@@ -1,32 +1,31 @@
 //
-// Created by Hayden Huynh on 10/28/19.
+// Created by Hayden Huynh on 10/29/19.
 //
 
-#ifndef LINKED_LIST_SINGLELINKEDLIST_H
-#define LINKED_LIST_SINGLELINKEDLIST_H
+#ifndef LINKED_LIST_DOUBLELINKEDLIST_H
+#define LINKED_LIST_DOUBLELINKEDLIST_H
 
-#include "SingleNode.h"
+#include "DoubleNode.h"
 
-class SingleLinkedList {
+class DoubleLinkedList {
 
 private:
-    SingleNode* pHead;
+    DoubleNode* pHead;
 
-    SingleNode* pTail;
+    DoubleNode* pTail;
 
     int size;
 
     bool rangeCheck(int i);
 
 public:
-
-    SingleLinkedList();
-
-
+    DoubleLinkedList();
 
     void insert(int val, int index);
 
     void traverse();
+
+    void reverseTraverse();
 
     void search(int val);
 
@@ -35,39 +34,43 @@ public:
     void deleteList();
 };
 
-SingleLinkedList::SingleLinkedList() {
+DoubleLinkedList::DoubleLinkedList() {
     pHead = NULL;
     pTail = NULL;
     size = 0;
 }
 
-bool SingleLinkedList::rangeCheck(int i) {
+bool DoubleLinkedList::rangeCheck(int i) {
     return 0 <= i && i < size;
 }
 
-void SingleLinkedList::insert(int val, int index) {
-    SingleNode* node = new SingleNode(val);
+void DoubleLinkedList::insert(int val, int index) {
+    DoubleNode* node = new DoubleNode(val);
     if (size == 0) {
-        std::cout << "\nLinked List is empty. Inserting the first node.\n";
+        std::cout << "\nInserting the first node.\n";
         pHead = node;
         pTail = node;
     }
     else {
         if (index == 0) {
             node->pNext = pHead;
+            pHead->pPrev = node;
             pHead = node;
         }
         else if (index == size) {
             pTail->pNext = node;
+            node->pPrev = pTail;
             pTail = node;
         }
         else {
             if (rangeCheck(index)) {
-                SingleNode* temp = pHead;
-                for (int i = 0; i < index-1; i++) {
+                DoubleNode* temp = pHead;
+                for (int i = 0; i < index - 1; i++) {
                     temp = temp->pNext;
                 }
+                node->pPrev = temp;
                 node->pNext = temp->pNext;
+                temp->pNext->pPrev = node;
                 temp->pNext = node;
             }
             else {
@@ -78,32 +81,43 @@ void SingleLinkedList::insert(int val, int index) {
     size++;
 }
 
-void SingleLinkedList::traverse() {
-    SingleNode* temp = pHead;
+void DoubleLinkedList::traverse() {
+    DoubleNode* temp = pHead;
     int count = 1;
     while (temp != NULL) {
-        std::cout << "Node " << count << ": " << temp->val << " -> ";
-        temp = temp->pNext;
+        std::cout << "Node " << count << ": " << temp->val << " <-> ";
         count++;
+        temp = temp->pNext;
     }
-    std::cout << "NULL\n";
+    std::cout << "NULL\n\n";
 }
 
-void SingleLinkedList::search(int val) {
-    SingleNode* temp = pHead;
+void DoubleLinkedList::reverseTraverse() {
+    DoubleNode* temp = pTail;
+    int count = size;
+    while (temp != NULL) {
+        std::cout << "Node " << count << ": " << temp->val << " <-> ";
+        count--;
+        temp = temp->pPrev;
+    }
+    std::cout << "NULL\n\n";
+}
+
+void DoubleLinkedList::search(int val) {
+    DoubleNode* temp = pHead;
     int count = 0;
     while (temp != NULL) {
         if (temp->val == val) {
             std::cout << "\nFound value: " << temp->val << " at index " << count << ".\n";
             return;
         }
-        temp = temp->pNext;
         count++;
+        temp = temp->pNext;
     }
     std::cout << "\nGiven value not found.\n";
 }
 
-void SingleLinkedList::deleteNode(int index) {
+void DoubleLinkedList::deleteNode(int index) {
     if (size == 0) {
         std::cout << "\nLinked List is already empty.\n";
     }
@@ -115,30 +129,28 @@ void SingleLinkedList::deleteNode(int index) {
         size--;
     }
     else {
-        SingleNode* deleteNode;
+        DoubleNode* deleteNode;
         if (index == 0) {
             deleteNode = pHead;
+            pHead->pNext->pPrev = NULL;
             pHead = pHead->pNext;
             delete deleteNode;
         }
         else if (index == size-1) {
             deleteNode = pTail;
-            SingleNode* temp = pHead;
-            for (int i = 0; i < index-1; i++) {
-                temp = temp->pNext;
-            }
-            temp->pNext = NULL;
-            pTail = temp;
+            pTail->pPrev->pNext = NULL;
+            pTail = pTail->pPrev;
             delete deleteNode;
         }
         else {
             if (rangeCheck(index)) {
-                SingleNode *temp = pHead;
+                DoubleNode* temp = pHead;
                 for (int i = 0; i < index - 1; i++) {
                     temp = temp->pNext;
                 }
                 deleteNode = temp->pNext;
                 temp->pNext = deleteNode->pNext;
+                deleteNode->pNext->pPrev = temp;
                 delete deleteNode;
             }
             else {
@@ -149,9 +161,9 @@ void SingleLinkedList::deleteNode(int index) {
     }
 }
 
-void SingleLinkedList::deleteList() {
-    SingleNode* temp = pHead;
-    while(pHead != NULL) {
+void DoubleLinkedList::deleteList() {
+    DoubleNode* temp = pHead;
+    while (pHead != NULL) {
         temp = temp->pNext;
         delete pHead;
         pHead = temp;
@@ -160,4 +172,4 @@ void SingleLinkedList::deleteList() {
     size = 0;
 }
 
-#endif //LINKED_LIST_SINGLELINKEDLIST_H
+#endif //LINKED_LIST_DOUBLELINKEDLIST_H

@@ -1,30 +1,31 @@
 //
-// Created by Hayden Huynh on 10/28/19.
+// Created by Hayden Huynh on 10/29/19.
 //
 
-#ifndef LINKED_LIST_CIRCULARSINGLELINKEDLIST_H
-#define LINKED_LIST_CIRCULARSINGLELINKEDLIST_H
+#ifndef LINKED_LIST_CIRCULARDOUBLELINKEDLIST_H
+#define LINKED_LIST_CIRCULARDOUBLELINKEDLIST_H
 
-#include "SingleNode.h"
+#include "DoubleNode.h"
 
-class CircularSingleLinkedList {
+class CircularDoubleLinkedList {
 
 private:
-    SingleNode* pHead;
+    DoubleNode* pHead;
 
-    SingleNode* pTail;
+    DoubleNode* pTail;
 
     int size;
 
     bool rangeCheck(int i);
 
 public:
-
-    CircularSingleLinkedList();
+    CircularDoubleLinkedList();
 
     void insert(int val, int index);
 
     void traverse();
+
+    void reverseTraverse();
 
     void search(int val);
 
@@ -33,42 +34,49 @@ public:
     void deleteList();
 };
 
-CircularSingleLinkedList::CircularSingleLinkedList() {
+CircularDoubleLinkedList::CircularDoubleLinkedList() {
     pHead = NULL;
     pTail = NULL;
     size = 0;
 }
 
-bool CircularSingleLinkedList::rangeCheck(int i) {
+bool CircularDoubleLinkedList::rangeCheck(int i) {
     return 0 <= i && i < size;
 }
 
-void CircularSingleLinkedList::insert(int val, int index) {
-    SingleNode* node = new SingleNode(val);
+void CircularDoubleLinkedList::insert(int val, int index) {
+    DoubleNode* node = new DoubleNode(val);
     if (size == 0) {
-        std::cout << "\nLinked List is empty. Inserting the first node.\n";
+        std::cout << "\nInserting the first node.\n";
+        node->pNext = node;
+        node->pPrev = node;
         pHead = node;
         pTail = node;
-        pTail->pNext = pHead;
     }
     else {
         if (index == 0) {
             node->pNext = pHead;
+            node->pPrev = pTail;
+            pTail->pNext = node;
+            pHead->pPrev = node;
             pHead = node;
-            pTail->pNext = pHead;
         }
         else if (index == size) {
+            node->pPrev = pTail;
             node->pNext = pHead;
             pTail->pNext = node;
+            pHead->pPrev = node;
             pTail = node;
         }
         else {
             if (rangeCheck(index)) {
-                SingleNode* temp = pHead;
-                for (int i = 0; i < index-1; i++) {
+                DoubleNode* temp = pHead;
+                for (int i = 0; i < index - 1; i++) {
                     temp = temp->pNext;
                 }
+                node->pPrev = temp;
                 node->pNext = temp->pNext;
+                temp->pNext->pPrev = node;
                 temp->pNext = node;
             }
             else {
@@ -79,22 +87,37 @@ void CircularSingleLinkedList::insert(int val, int index) {
     size++;
 }
 
-void CircularSingleLinkedList::traverse() {
-    SingleNode* temp = pHead;
+void CircularDoubleLinkedList::traverse() {
+    DoubleNode* temp = pHead;
     for (int i = 0; i < size; i++) {
-        std::cout << "Node " << i+1 << ": " << temp->val << " -> ";
+        std::cout << "Node " << i+1 << ": " << temp->val << " <-> ";
         temp = temp->pNext;
     }
     if (pHead != NULL) {
-        std::cout << "Node 1: " << pHead->val;
+        std::cout << "Node 1: " << pHead->val << "\n\n";
     }
     else {
-        std::cout << "NULL";
+        std::cout << "NULL\n\n";
+    }
+
+}
+
+void CircularDoubleLinkedList::reverseTraverse() {
+    DoubleNode* temp = pTail;
+    for (int i = size; i > 0; i--) {
+        std::cout << "Node " << i << ": " << temp->val << " <-> ";
+        temp = temp->pPrev;
+    }
+    if (pTail != NULL) {
+        std::cout << "Node " << size << ": " << pTail->val << "\n\n";
+    }
+    else {
+        std::cout << "NULL\n\n";
     }
 }
 
-void CircularSingleLinkedList::search(int val) {
-    SingleNode* temp = pHead;
+void CircularDoubleLinkedList::search(int val) {
+    DoubleNode* temp = pHead;
     for (int i = 0; i < size; i++) {
         if (temp->val == val) {
             std::cout << "\nFound value: " << temp->val << " at index " << i << ".\n";
@@ -105,7 +128,7 @@ void CircularSingleLinkedList::search(int val) {
     std::cout << "\nGiven value not found.\n";
 }
 
-void CircularSingleLinkedList::deleteNode(int index) {
+void CircularDoubleLinkedList::deleteNode(int index) {
     if (size == 0) {
         std::cout << "\nLinked List is already empty.\n";
     }
@@ -117,31 +140,33 @@ void CircularSingleLinkedList::deleteNode(int index) {
         size--;
     }
     else {
-        SingleNode *deleteNode;
+        DoubleNode* deleteNode;
         if (index == 0) {
             deleteNode = pHead;
+            pHead->pNext->pPrev = pTail;
             pHead = pHead->pNext;
             pTail->pNext = pHead;
             delete deleteNode;
-        } else if (index == size - 1) {
+        }
+        else if (index == size-1) {
             deleteNode = pTail;
-            SingleNode *temp = pHead;
-            for (int i = 0; i < index - 1; i++) {
-                temp = temp->pNext;
-            }
-            temp->pNext = pHead;
-            pTail = temp;
+            pTail->pPrev->pNext = pHead;
+            pTail = pTail->pPrev;
+            pHead->pPrev = pTail;
             delete deleteNode;
-        } else {
+        }
+        else {
             if (rangeCheck(index)) {
-                SingleNode *temp = pHead;
+                DoubleNode* temp = pHead;
                 for (int i = 0; i < index - 1; i++) {
                     temp = temp->pNext;
                 }
                 deleteNode = temp->pNext;
                 temp->pNext = deleteNode->pNext;
+                deleteNode->pNext->pPrev = temp;
                 delete deleteNode;
-            } else {
+            }
+            else {
                 std::cout << "\nIndex out of range.\n";
             }
         }
@@ -149,10 +174,11 @@ void CircularSingleLinkedList::deleteNode(int index) {
     }
 }
 
-void CircularSingleLinkedList::deleteList() {
-    SingleNode* temp = pHead;
+void CircularDoubleLinkedList::deleteList() {
+    pHead->pPrev = NULL;
     pTail->pNext = NULL;
-    while(pHead != NULL) {
+    DoubleNode* temp = pHead;
+    while (pHead != NULL) {
         temp = temp->pNext;
         delete pHead;
         pHead = temp;
@@ -161,5 +187,4 @@ void CircularSingleLinkedList::deleteList() {
     size = 0;
 }
 
-
-#endif //LINKED_LIST_CIRCULARSINGLELINKEDLIST_H
+#endif //LINKED_LIST_CIRCULARDOUBLELINKEDLIST_H

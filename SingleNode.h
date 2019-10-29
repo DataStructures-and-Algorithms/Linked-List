@@ -10,6 +10,7 @@
 class SingleNode {
 
 public:
+
     int val;
 
     SingleNode* pNext;
